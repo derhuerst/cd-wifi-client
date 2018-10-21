@@ -133,6 +133,7 @@ const fetchWifiConnectivity = () => {
 	})
 }
 
+// todo
 module.exports = {
 	fetchWifiStatus,
 	acknowledgeCaptivePortal,

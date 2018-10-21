@@ -19,7 +19,16 @@ npm install cd-wifi-client
 ## Usage
 
 ```js
-todo
+const {acknowledgeCaptivePortal} = require('cd-wifi-client')
+
+const acknowledgeLegalTerms = (msg) => {
+	console.log(msg)
+	return Promise.resolve() // we always accept
+}
+
+acknowledgeCaptivePortal(acknowledgeLegalTerms)
+.then(successMsg => console.info(successMsg))
+.catch(console.error)
 ```
 
 
