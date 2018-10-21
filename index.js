@@ -3,6 +3,7 @@
 const {stringify} = require('query-string')
 const Promise = require('pinkie-promise')
 const {fetch} = require('fetch-ponyfill')({Promise})
+const parseJsonp = require('parse-jsonp')
 
 const endpoint = 'http://cdwifi.cz/portal/api'
 
@@ -84,7 +85,59 @@ const acknowledgeCaptivePortal = (acknowledgeLegalTerms, locale = 'en_GB') => {
 	})
 }
 
+const fetchDataUsage = () => {
+	return sendRequest('/vehicle/gateway/data/limit')
+	.then((_) => ({
+		used: _.usedAmount,
+		limit: _.totalLimit,
+		region: _.region
+	}))
+}
+
+const fetchTrainStatus = (distances = 'km', temperatures = 'c') => {
+	return sendRequest('/vehicle/realtime', {distances, temperatures})
+	.then((_) => ({
+		latitude: parseInt(_.gpsLat, 10),
+		longitude: parseInt(_.gpsLng, 10),
+		altitude: _.altitude,
+		speed: _.speed,
+		delay: _.delay // todo: in seconds? in minutes?
+	}))
+}
+
+const fetchNotifications = () => {
+	return sendRequest('/notification')
+	// todo: parse response
+}
+
+const fetchWifiConnectivity = () => {
+	return fetch('http://www.info.cdwifi.cz/api/jsonp/connectivity?callback=jsonp', {
+		redirect: 'follow',
+		cache: 'no-store',
+		headers: {
+			accept: 'application/json',
+			referrer: 'http://cdwifi.cz/'
+		}
+	})
+	.then((res) => {
+		if (!res.ok) {
+			err.message = res.statusText
+			err.statusCode = res.status
+			throw err
+		}
+		return res.text()
+	})
+	.then((jsonp) => {
+		return parseJsonp('jsonp', jsonp)
+		// todo: parse response
+	})
+}
+
 module.exports = {
 	fetchWifiStatus,
-	acknowledgeCaptivePortal
+	acknowledgeCaptivePortal,
+	fetchDataUsage,
+	fetchTrainStatus,
+	fetchNotifications,
+	fetchWifiConnectivity
 }

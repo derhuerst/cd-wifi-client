@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"fetch-ponyfill": "^6.0.2",
+		"parse-jsonp": "^1.0.0",
 		"pinkie-promise": "^2.0.1",
 		"query-string": "^6.2.0"
 	},
