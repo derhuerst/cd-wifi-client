@@ -30,13 +30,5 @@
 		"parse-jsonp": "^1.0.0",
 		"pinkie-promise": "^2.0.1",
 		"query-string": "^6.2.0"
-	},
-	"devDependencies": {
-		"tap-min": "^1.2.2",
-		"tape": "^4.9.1"
-	},
-	"scripts": {
-		"test": "env NODE_ENV=dev node test.js | tap-min",
-		"prepublishOnly": "npm test"
 	}
 }
