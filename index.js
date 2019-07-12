@@ -59,7 +59,7 @@ const acknowledgeCaptivePortal = (acknowledgeLegalTerms, locale = 'en_GB') => {
 		throw new Error('acknowledgeLegalTerms must be a Promise-retuning function.')
 	}
 
-	return fetchStatus()
+	return fetchWifiStatus()
 	.then((status) => {
 		if (status.authenticated) return 'Already authenticated.'
 
@@ -83,6 +83,7 @@ const acknowledgeCaptivePortal = (acknowledgeLegalTerms, locale = 'en_GB') => {
 			throw new Error('Authentication failed.')
 		})
 	})
+	.then(() => undefined)
 }
 
 const fetchDataUsage = () => {
@@ -97,8 +98,8 @@ const fetchDataUsage = () => {
 const fetchTrainStatus = (distances = 'km', temperatures = 'c') => {
 	return sendRequest('/vehicle/realtime', {distances, temperatures})
 	.then((_) => ({
-		latitude: parseInt(_.gpsLat, 10),
-		longitude: parseInt(_.gpsLng, 10),
+		latitude: parseFloat(_.gpsLat),
+		longitude: parseFloat(_.gpsLng),
 		altitude: _.altitude,
 		speed: _.speed,
 		delay: _.delay // todo: in seconds? in minutes?
