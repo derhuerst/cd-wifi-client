@@ -1,6 +1,7 @@
 'use strict'
 
 const {stringify} = require('query-string')
+const AbortController = require('abort-controller')
 const Promise = require('pinkie-promise')
 const {fetch} = require('fetch-ponyfill')({Promise})
 const parseJsonp = require('parse-jsonp')
@@ -14,8 +15,15 @@ const sendRequest = (path, query = null, opt = {}, handleResponse = false) => {
 		headers: {
 			accept: 'application/json',
 			referrer: 'http://cdwifi.cz/'
-		}
+		},
 	}, opt)
+
+	let timeout = null
+	if ('timeout' in opt) {
+		const controller = new AbortController()
+		opt.signal = controller.signal
+		timeout = setTimeout(() => controller.abort(), opt.timeout)
+	}
 
 	let url = endpoint + path
 	if (query !== null) url += '?' + stringify(query)
@@ -26,13 +34,18 @@ const sendRequest = (path, query = null, opt = {}, handleResponse = false) => {
 	// todo: resolve DNS using WiFi-local DNS server
 	const req = fetch(url, opt)
 	if (handleResponse) return req
-	return req.then((res) => {
+
+	return req
+	.then((res) => {
 		if (!res.ok) {
 			err.message = res.statusText
 			err.statusCode = res.status
 			throw err
 		}
 		return res.json()
+	})
+	.finally(() => {
+		clearTimeout(timeout)
 	})
 }
 
